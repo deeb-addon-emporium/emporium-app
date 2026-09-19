@@ -101,7 +101,7 @@
     },
     "THEME": {
       "ALLIANCE": "Alliance",
-      "DEFAULT": "WowUp",
+      "DEFAULT": "Emporium",
       "GROUP_DARK": "Dark",
       "GROUP_LIGHT": "Light",
       "HORDE": "Horde"
@@ -363,7 +363,7 @@
     "ABOUT": {
       "ATTRIBUTIONS_TITLE": "Attributions",
       "CHANGE_LOG_SECTION_LABEL": "Change Log",
-      "TITLE": "WowUp.io",
+      "TITLE": "Deeb's Addon Emporium",
       "WEBSITE_LINK_LABEL": "Check out the website!"
     },
     "ACCOUNT": {

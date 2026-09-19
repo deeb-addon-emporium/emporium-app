@@ -49,7 +49,7 @@ export class WowUpAddonProvider extends AddonProvider {
   public readonly allowChannelChange = true;
   public readonly allowEdit = true;
   public readonly canBatchFetch = true;
-  public enabled = true;
+  public enabled = false; // Emporium: off by default, GitHub carries the catalogue
 
   public constructor(
     private _baseUrl: string,

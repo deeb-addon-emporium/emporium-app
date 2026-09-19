@@ -21,7 +21,7 @@ export class TukUiAddonProvider extends AddonProvider {
   public readonly allowChannelChange = false;
   public readonly allowEdit = true;
 
-  public enabled = true;
+  public enabled = false; // Emporium: off by default, GitHub carries the catalogue
 
   public constructor(private _networkInterface: NetworkInterface) {
     super();
