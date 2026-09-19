@@ -249,7 +249,7 @@ export class GitHubAddonProvider extends AddonProvider {
             folders: [],
             gameVersion: "",
             releaseDate: new Date(result.release?.published_at ?? ""),
-            version: asset?.name ?? "",
+            version: (result.release?.tag_name ?? asset?.name ?? "").replace(/^v/, ""),
           },
         ],
       };
@@ -311,7 +311,7 @@ export class GitHubAddonProvider extends AddonProvider {
       downloadUrl: asset?.url ?? "",
       folders: [addonName],
       gameVersion: "",
-      version: asset?.name ?? "",
+      version: (assetResult.release?.tag_name ?? asset?.name ?? "").replace(/^v/, ""),
       releaseDate: new Date(asset?.created_at ?? ""),
       changelog: convertMarkdown(assetResult?.release?.body ?? ""),
     };
