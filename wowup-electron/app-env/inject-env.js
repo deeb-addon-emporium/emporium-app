@@ -20,9 +20,8 @@ const packagePath = path.join(__dirname, "..", "package.json");
 let packageData = fs.readFileSync(packagePath, "utf8");
 let packageJson = JSON.parse(packageData);
 
-packageJson.name = process.env.BUILD_FLAVOR === "ow" ? "wowup-cf" : "wowup";
-packageJson.productName = process.env.BUILD_FLAVOR === "ow" ? "WowUpCf" : "WowUp";
-packageJson.repository.url =
-  process.env.BUILD_FLAVOR === "ow" ? "https://github.com/WowUp/WowUp.CF.git" : "https://github.com/WowUp/WowUp.git";
+packageJson.name = "deeb-addon-emporium";
+packageJson.productName = "DeebsAddonEmporium";
+packageJson.repository.url = "https://github.com/deeb-addon-emporium/emporium-app.git";
 
 fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2));

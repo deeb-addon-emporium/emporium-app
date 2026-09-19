@@ -52,7 +52,7 @@ export function createTray(window: BrowserWindow, config: SystemTrayConfig): boo
     });
   }
 
-  _trayRef.setToolTip("WowUp");
+  _trayRef.setToolTip("Deeb's Addon Emporium");
   _trayRef.setContextMenu(contextMenu);
 
   return true;
