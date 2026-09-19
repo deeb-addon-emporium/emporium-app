@@ -1,23 +1,29 @@
 {
-  "productName": "WowUp",
-  "appId": "io.wowup.jliddev",
+  "productName": "DeebsAddonEmporium",
+  "appId": "io.deeb.emporium",
   "directories": {
     "output": "release/"
   },
   "afterSign": "./electron-build/after-sign.js",
   "generateUpdatesFilesForAllChannels": true,
-  "publish": ["github"],
+  "publish": [
+    "github"
+  ],
   "nodeGypRebuild": true,
-  "files": ["dist/**/*.*", "assets/**/*.*", "app-build/**/*.js", "src/common/**/*.js", "build/Release/*.node"],
+  "files": [
+    "dist/**/*.*",
+    "assets/**/*.*",
+    "app-build/**/*.js",
+    "src/common/**/*.js",
+    "build/Release/*.node"
+  ],
   "win": {
     "icon": "electron-build/icon.ico",
-    "target": ["nsis", "portable"],
-    "forceCodeSigning": false,
-    "signtoolOptions": {
-      "sign": "./electron-build/sign-windows.js",
-      "signingHashAlgorithms": ["sha256"],
-      "publisherName": "WowUp LLC"
-    }
+    "target": [
+      "nsis",
+      "portable"
+    ],
+    "forceCodeSigning": false
   },
   "nsis": {
     "deleteAppDataOnUninstall": true
@@ -28,7 +34,10 @@
     "target": [
       {
         "target": "default",
-        "arch": ["x64", "arm64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       }
     ],
     "hardenedRuntime": true,
@@ -45,7 +54,9 @@
   },
   "linux": {
     "icon": "electron-build/flatpak/",
-    "target": ["AppImage"],
+    "target": [
+      "AppImage"
+    ],
     "asarUnpack": "**/*.node"
   },
   "flatpak": {

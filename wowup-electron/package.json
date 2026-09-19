@@ -1,9 +1,9 @@
 {
-  "name": "wowup-cf",
-  "productName": "WowUpCf",
-  "version": "2.23.1",
+  "name": "deeb-addon-emporium",
+  "productName": "DeebsAddonEmporium",
+  "version": "0.1.0",
   "private": true,
-  "description": "World of Warcraft addon updater",
+  "description": "Deeb's Addon Emporium: WoW Forever addon manager, a WowUp fork",
   "keywords": [
     "wow",
     "world of warcraft"

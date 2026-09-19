@@ -1,7 +1,8 @@
 name: Build WowUp Electron Linux
 on:
-  # - push
   workflow_dispatch:
+  push:
+    tags: ["v*"]
 
 jobs:
   # create-release:

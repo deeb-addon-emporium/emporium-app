@@ -106,9 +106,9 @@
       "GROUP_LIGHT": "Light",
       "HORDE": "Horde"
     },
-    "WINDOW_TITLE": "WowUp.io",
+    "WINDOW_TITLE": "Deeb's Addon Emporium",
     "WINDOW_TITLE_CF": "WowUp.io CF",
-    "WINDOW_TITLE_FULLSCREEN": "WowUp.io - Full Screen",
+    "WINDOW_TITLE_FULLSCREEN": "Deeb's Addon Emporium - Full Screen",
     "WOWUP_UPDATE": {
       "CHECKING_FOR_UPDATE": "Checking for update",
       "DOWNLOADED_TOOLTIP": "Install WowUp update",
@@ -194,7 +194,7 @@
       "ANNIVERSARY": "Burning Crusade Anniversary",
       "BETA": "The War Within Beta",
       "CLASSIC": "Mists of Pandaria Classic",
-      "CLASSICBETA": "MoP Classic Beta",
+      "CLASSICBETA": "WoW Forever",
       "CLASSICERA": "World of Warcraft Classic",
       "CLASSICERAPTR": "PTR (Classic Era)",
       "CLASSICPTR": "PTR (MoP Classic)",

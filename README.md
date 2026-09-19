@@ -1,86 +1,12 @@
-<p align="center">
-  <img src="https://cdn.wowup.io/site/assets/icons/android-chrome-512x512.png" width="200" />
-</p>
+# Deeb's Addon Emporium
 
-# WowUp Client Repository
+A [WowUp](https://github.com/WowUp/WowUp) fork for **WoW Forever** (the `_classic_beta_` client).
+Every addon from [the catalogue](https://github.com/deeb-addon-emporium/emporium) shows up on the
+Get Addons page. Click install. Updates arrive like any other addon.
 
-[![WowUp on Discord](https://img.shields.io/static/v1?label=Discord&message=WowUp&color=7289DA)](https://discord.gg/rk4F5aD)
-[![WowUp on Patreon](https://img.shields.io/static/v1?label=Patreon&message=WowUp&color=f96854)](https://www.patreon.com/jliddev)
+Windows installer and Linux AppImage are on the Releases page. Windows will show a SmartScreen
+warning the first time, because the build is not code-signed. Linux: point it at the folder that
+contains `_classic_beta_` (a Lutris `battlenet/drive_c` prefix is found on its own).
 
-This is the repository for our [WowUp](https://wowup.io) client with [CurseForge](https://curseforge.com) support for Windows, Mac, and Linux.
-
-## WowUp
-
-![image](https://user-images.githubusercontent.com/20467484/150164985-673d02da-e7ec-42aa-b77d-655c8e3117ff.png)
-
-WowUp is the community centered World of Warcraft addon updater. We attempt to bring the addon community together in an easy to use updater application. We have an ever growing list of supported features.
-
-- Support for all major addon sources
-- Discover or find new addons across addon sources
-- Handle all your different World of Warcraft clients
-- Auto updates
-- [Companion addon](https://github.com/WowUp/WowUp.Addon)
-
-## Installing
-
-### Latest Releases
-
-The latest WowUp release is always available on our website [wowup.io](https://wowup.io)
-
-### Beta Releases
-
-If you feel like helping us test the latest and greatest changes beta builds are available on [GitHub](https://github.com/WowUp/WowUp/releases)
-
-### Community Support Alternatives
-
-#### [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
-
-Ships with Windows 10 and 11.  You can install WowUp With Wago using:
-
-```cmd
-winget install wowup.wowup
-```
-
-Or Wowup with CurseForge with:
-
-```cmd
-winget install wowup.cf
-```
-
-#### [Chocolatey](https://chocolatey.org)
-
-You can also install the latest version via Chocolatey package manager:
-
-```cmd
-choco install wowup
-```
-
-## Contributing
-
-We welcome any and all contributions from translations to feature pull requests.
-
-Please read our [contribution guide](https://github.com/WowUp/WowUp/blob/master/CONTRIBUTING.md) to get started.
-
-## Feedback
-
-If you have a question, comment, or request we have several ways you can communicate them.
-
-- Create a [bug or feature request](https://github.com/WowUp/WowUp/issues)
-- Contact us on [Discord](https://discord.gg/rk4F5aD)
-
-## Related Projects
-
-We have a couple companion projects that are related to WowUp
-
-- [Companion Addon](https://github.com/WowUp/WowUp.Addon)
-- [App Updater](https://github.com/WowUp/WowUpUpdater) (Deprecated)
-
-## Code of Conduct
-
-Please read and understand our [Code of Coduct](https://github.com/WowUp/WowUp/blob/master/CODE_OF_CONDUCT.md) when submitting a bug or feature request here or on Discord.
-
-## License
-
-Copyright (c) WowUp LLC. All rights reserved.
-
-Licensed under the [GNU General Public License v3.0](https://github.com/WowUp/WowUp/blob/master/LICENSE) license.
+What changed from WowUp: the GitHub provider reads `catalogue.json` for featured and search
+results, WoW Forever accepts a plain release zip, branding, unsigned Windows build, builds on tag.

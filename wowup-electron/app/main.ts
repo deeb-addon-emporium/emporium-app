@@ -279,7 +279,7 @@ function createWindow(): BrowserWindow {
     transparent: false,
     resizable: true,
     backgroundColor: getBackgroundColor(),
-    title: "WowUp" + (AppEnv.buildFlavor === "ow" ? " CF" : ""),
+    title: "Deeb's Addon Emporium",
     titleBarStyle: "hidden",
     webPreferences: {
       preload: join(__dirname, "preload.js"),

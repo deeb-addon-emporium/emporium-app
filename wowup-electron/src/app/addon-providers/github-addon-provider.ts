@@ -27,6 +27,11 @@ import {
 import { GitHubAsset, GitHubRelease, GitHubRepository, WowInstallation } from "wowup-lib-core";
 import { SourceRemovedAddonError } from "wowup-lib-core";
 
+// Deeb's Addon Emporium: the catalogue every "featured" and search result comes from.
+const EMPORIUM_CATALOGUE_URL = "https://raw.githubusercontent.com/deeb-addon-emporium/emporium/master/catalogue.json";
+interface EmporiumEntry { name: string; repo: string; description: string; version: string; }
+interface EmporiumCatalogue { name: string; client: string; addons: EmporiumEntry[]; }
+
 type MetadataFlavor = "bcc" | "classic" | "mainline" | "wrath" | "cata" | "mists";
 
 interface LatestValidAsset {
@@ -80,6 +85,60 @@ export class GitHubAddonProvider extends AddonProvider {
     private _sensitiveStorageService: SensitiveStorageService,
   ) {
     super();
+  }
+
+  private _catalogue: EmporiumCatalogue | undefined;
+
+  private async getCatalogue(): Promise<EmporiumCatalogue> {
+    if (this._catalogue) {
+      return this._catalogue;
+    }
+    const url = `${EMPORIUM_CATALOGUE_URL}?t=${Date.now()}`;
+    this._catalogue = await firstValueFrom(this._httpClient.get<EmporiumCatalogue>(url));
+    return this._catalogue;
+  }
+
+  private async catalogueToResults(entries: EmporiumEntry[], installation: WowInstallation): Promise<AddonSearchResult[]> {
+    const settled = await Promise.allSettled(
+      entries.map(async (entry) => {
+        const res = await this.searchByUrl(new URL(entry.repo), installation);
+        const hit = res?.searchResult;
+        if (hit) {
+          hit.summary = entry.description;
+          hit.name = entry.name;
+        }
+        return hit;
+      }),
+    );
+    return settled
+      .filter((r): r is PromiseFulfilledResult<AddonSearchResult | undefined> => r.status === "fulfilled")
+      .map((r) => r.value)
+      .filter((r): r is AddonSearchResult => r !== undefined);
+  }
+
+  // Every catalogue addon shows up on the Get Addons page with no URL pasting.
+  public async getFeaturedAddons(installation: WowInstallation): Promise<AddonSearchResult[]> {
+    try {
+      const cat = await this.getCatalogue();
+      return await this.catalogueToResults(cat.addons, installation);
+    } catch (e) {
+      console.error("emporium catalogue failed", e);
+      return [];
+    }
+  }
+
+  public async searchByQuery(query: string, installation: WowInstallation): Promise<AddonSearchResult[]> {
+    try {
+      const cat = await this.getCatalogue();
+      const q = query.trim().toLowerCase();
+      const hits = cat.addons.filter(
+        (a) => a.name.toLowerCase().includes(q) || a.description.toLowerCase().includes(q),
+      );
+      return await this.catalogueToResults(hits, installation);
+    } catch (e) {
+      console.error("emporium search failed", e);
+      return [];
+    }
   }
 
   public async getDownloadAuth(): Promise<DownloadAuth | undefined> {
@@ -459,8 +518,10 @@ export class GitHubAddonProvider extends AddonProvider {
         return isClassic;
       case WowClientType.Classic:
       case WowClientType.ClassicPtr:
-      case WowClientType.ClassicBeta:
         return isMists;
+      case WowClientType.ClassicBeta:
+        // WoW Forever: a plain zip is the right zip
+        return !isClassic && !isBurningCrusade && !isWotlk && !isCataclysm && !isMists;
       case WowClientType.Anniversary:
         return isBurningCrusade;
       default:
