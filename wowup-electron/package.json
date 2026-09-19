@@ -1,7 +1,7 @@
 {
   "name": "deeb-addon-emporium",
   "productName": "DeebsAddonEmporium",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "Deeb's Addon Emporium: WoW Forever addon manager, a WowUp fork",
   "keywords": [
