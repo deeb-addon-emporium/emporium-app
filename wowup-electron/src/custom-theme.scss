@@ -31,10 +31,10 @@
 }
 
 $md-wowup-palette: (
-  50: #e8eaf6,
-  100: #6b69d6,
-  200: #504fa1,
-  300: #383773,
+  50: #f7edd6,
+  100: #c9952a,
+  200: #9a7020,
+  300: #6b4d15,
   400: #5c6bc0,
   500: #3f51b5,
   600: #3949ab,
@@ -44,7 +44,7 @@ $md-wowup-palette: (
   A100: $wowup-purple-1,
   A200: $wowup-control,
   A400: $wowup-purple-3,
-  A700: #6874bb,
+  A700: #e0b24a,
   contrast: (
     50: #000000,
     100: #ffffff,
@@ -105,10 +105,10 @@ $wowup-light-theme: mat.define-light-theme(
 
 // Horde theme
 $horde-palette: (
-  50: #e8eaf6,
+  50: #f7edd6,
   100: $horde-red-1,
-  200: #504fa1,
-  300: #383773,
+  200: #9a7020,
+  300: #6b4d15,
   400: #5c6bc0,
   500: #3f51b5,
   600: #3949ab,
@@ -118,7 +118,7 @@ $horde-palette: (
   A100: $horde-red-1,
   A200: $horde-control,
   A400: $horde-red-3,
-  A700: #6874bb,
+  A700: #e0b24a,
   contrast: (
     50: #000000,
     100: #ffffff,
@@ -169,10 +169,10 @@ $horde-theme-light: mat.define-light-theme(
 
 // Alliance theme
 $alliance-palette: (
-  50: #e8eaf6,
+  50: #f7edd6,
   100: $alliance-blue-1,
   200: $alliance-blue-2,
-  300: #383773,
+  300: #6b4d15,
   400: #5c6bc0,
   500: #3f51b5,
   600: #3949ab,
@@ -182,7 +182,7 @@ $alliance-palette: (
   A100: $alliance-blue-1,
   A200: $alliance-control,
   A400: $alliance-blue-3,
-  A700: #6874bb,
+  A700: #e0b24a,
   contrast: (
     50: #000000,
     100: #ffffff,
@@ -264,9 +264,9 @@ body {
 }
 
 .default-theme {
-  --background-primary: #6b69d6;
-  --background-primary-2: #504fa1;
-  --background-primary-3: #383773;
+  --background-primary: #c9952a;
+  --background-primary-2: #9a7020;
+  --background-primary-3: #6b4d15;
   --background-secondary-1: rgba(102, 102, 102, 0.85);
   --background-secondary-2: rgba(85, 85, 85, 0.9);
   --background-secondary-2-fill: rgba(85, 85, 85, 1);
@@ -290,7 +290,7 @@ body {
   --footer-hover: #444444;
 
   --title-logo: url("assets/images/emporium-logo.png");
-  --theme-logo: url("assets/images/wowup-white-1.png");
+  --theme-logo: url("assets/images/emporium-logo.png");
   --ad-placeholder: url("assets/images/wowup-placeholder.png");
 
   --mat-sidenav-content-background-color: rgba(0, 0, 0, 0);
@@ -298,9 +298,9 @@ body {
 }
 
 .default-theme-light-theme {
-  --background-primary: #6b69d6;
-  --background-primary-2: #504fa1;
-  --background-primary-3: #383773;
+  --background-primary: #c9952a;
+  --background-primary-2: #9a7020;
+  --background-primary-3: #6b4d15;
   --background-secondary-1: rgba(255, 255, 255, 0.75);
   --background-secondary-2: rgba(243, 243, 243, 0.8);
   --background-secondary-2-fill: rgba(243, 243, 243, 1);
@@ -827,7 +827,7 @@ div.tree > tree-node > div > .node-wrapper > tree-node-expander > .toggle-childr
 .lb-cancel {
   width: 80px;
   height: 80px;
-  background-image: url("assets/images/wowup-white-1.png");
+  background-image: url("assets/images/emporium-logo.png");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
