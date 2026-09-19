@@ -7,7 +7,12 @@
   "afterSign": "./electron-build/after-sign.js",
   "generateUpdatesFilesForAllChannels": true,
   "publish": [
-    "github"
+    {
+      "provider": "github",
+      "owner": "deeb-addon-emporium",
+      "repo": "emporium-app",
+      "releaseType": "release"
+    }
   ],
   "nodeGypRebuild": true,
   "files": [

@@ -8,10 +8,9 @@
     "wow",
     "world of warcraft"
   ],
-  "homepage": "https://wowup.io",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WowUp/WowUp.CF.git"
+    "url": "https://github.com/deeb-addon-emporium/emporium-app.git"
   },
   "author": {
     "name": "WowUp LLC",
@@ -192,5 +191,8 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "gypfile": true
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/deeb-addon-emporium/emporium-app/issues"
+  }
 }
