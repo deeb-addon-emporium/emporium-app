@@ -104,7 +104,7 @@ export class SessionService {
 
   private updateAdSpace() {
     const allProviders = this._addonProviderService.getEnabledAddonProviders();
-    this._adSpaceSrc.next(allProviders.findIndex((p) => p.adRequired) !== -1);
+    this._adSpaceSrc.next(allProviders.findIndex((p) => p.adRequired && p.enabled) !== -1);
   }
 
   public get wowUpAuthToken(): string {

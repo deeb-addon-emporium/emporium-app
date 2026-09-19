@@ -26,6 +26,8 @@ import {
 } from "wowup-lib-core";
 import { GitHubAsset, GitHubRelease, GitHubRepository, WowInstallation } from "wowup-lib-core";
 import { SourceRemovedAddonError } from "wowup-lib-core";
+import { Addon, AddonFolder } from "wowup-lib-core";
+import { v4 as uuidv4 } from "uuid";
 
 // Deeb's Addon Emporium: the catalogue every "featured" and search result comes from.
 const EMPORIUM_CATALOGUE_URL = "https://raw.githubusercontent.com/deeb-addon-emporium/emporium/master/catalogue.json";
@@ -138,6 +140,70 @@ export class GitHubAddonProvider extends AddonProvider {
     } catch (e) {
       console.error("emporium search failed", e);
       return [];
+    }
+  }
+
+  // Folders already in AddOns whose name is in the catalogue belong to the Emporium: adopt them
+  // so they get updates instead of sitting as "Unknown / Ignored".
+  public override async scan(
+    installation: WowInstallation,
+    addonChannelType: AddonChannelType,
+    addonFolders: AddonFolder[],
+  ): Promise<void> {
+    let cat: EmporiumCatalogue;
+    try {
+      cat = await this.getCatalogue();
+    } catch (e) {
+      console.error("emporium scan: catalogue failed", e);
+      return;
+    }
+    for (const folder of addonFolders) {
+      if (folder.matchingAddon) {
+        continue;
+      }
+      const entry = cat.addons.find((a) => a.name.toLowerCase() === folder.name.toLowerCase());
+      if (!entry) {
+        continue;
+      }
+      try {
+        const repoPath = new URL(entry.repo).pathname.replace(/^\/+/, "");
+        const result = await this.getByIdAsync(repoPath, installation);
+        const file = result?.files?.[0];
+        if (!result || !file) {
+          continue;
+        }
+        const installedVersion = folder.tocs?.[0]?.version ?? file.version;
+        const addon: Addon = {
+          id: uuidv4(),
+          name: entry.name,
+          author: result.author,
+          summary: entry.description,
+          externalId: result.externalId,
+          externalUrl: result.externalUrl,
+          providerName: this.name,
+          thumbnailUrl: result.thumbnailUrl,
+          downloadUrl: file.downloadUrl,
+          installedVersion,
+          latestVersion: file.version,
+          installedAt: folder.fileStats?.mtimeMs ? new Date(folder.fileStats.mtimeMs) : new Date(),
+          installedFolders: folder.name,
+          installedFolderList: [folder.name],
+          gameVersion: folder.tocs?.[0]?.interface ?? [],
+          isIgnored: false,
+          isLoadOnDemand: false,
+          autoUpdateEnabled: false,
+          autoUpdateNotificationsEnabled: false,
+          clientType: installation.clientType,
+          channelType: addonChannelType,
+          updatedAt: new Date(),
+          releasedAt: file.releaseDate,
+          externalLatestReleaseId: file.version,
+          installationId: installation.id,
+        };
+        folder.matchingAddon = addon;
+      } catch (e) {
+        console.error("emporium scan: " + folder.name, e);
+      }
     }
   }
 
