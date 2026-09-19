@@ -36,7 +36,7 @@
     "electron:publish": "npm run build:lib && npm run lint && npm run build:prod && electron-builder -c electron-build/electron-builder.json build --publish always",
     "electron:publish:never": "npm run electron:build && electron-builder --publish never",
     "electron:publish:local": "npm run lint && npm run build:dev && npx electron-builder -c electron-build/electron-builder-local.json --publish never",
-    "build:lib": "cd ../wowup-lib && npm run build",
+    "build:lib": "cd ../wowup-lib && npm ci && npm run build",
     "ow:start": "npm-run-all -p ow:electron:serve ow:ng:serve",
     "ow:build": "cross-env BUILD_FLAVOR=ow npm run build:injectenv && npm run ow:electron:serve-tsc && ng build --base-href ./",
     "ow:build:dev": "npm run ow:build -- -c ow-dev",
