@@ -90,6 +90,10 @@ export class GitHubAddonProvider extends AddonProvider {
   }
 
   private _catalogue: EmporiumCatalogue | undefined;
+  // a token GitHub refused (expired or revoked): dropped for the session so public repos keep working
+  private _tokenRefused = false;
+  // the last full catalogue list per install, shown again when GitHub refuses a refresh (hourly limit)
+  private _lastFeatured = new Map<string, AddonSearchResult[]>();
 
   private async getCatalogue(): Promise<EmporiumCatalogue> {
     if (this._catalogue) {
@@ -101,6 +105,13 @@ export class GitHubAddonProvider extends AddonProvider {
   }
 
   private async catalogueToResults(entries: EmporiumEntry[], installation: WowInstallation): Promise<AddonSearchResult[]> {
+    return (await this.catalogueResults(entries, installation)).results;
+  }
+
+  private async catalogueResults(
+    entries: EmporiumEntry[],
+    installation: WowInstallation,
+  ): Promise<{ results: AddonSearchResult[]; limited: boolean }> {
     const settled = await Promise.allSettled(
       entries.map(async (entry) => {
         const res = await this.searchByUrl(new URL(entry.repo), installation);
@@ -112,20 +123,33 @@ export class GitHubAddonProvider extends AddonProvider {
         return hit;
       }),
     );
-    return settled
+    const results = settled
       .filter((r): r is PromiseFulfilledResult<AddonSearchResult | undefined> => r.status === "fulfilled")
       .map((r) => r.value)
       .filter((r): r is AddonSearchResult => r !== undefined);
+    // searchByUrl rethrows, so an entry GitHub's hourly limit refused comes back rejected
+    const limited = settled.some((r) => r.status === "rejected" && r.reason instanceof GitHubLimitError);
+    return { results, limited };
   }
 
   // Every catalogue addon shows up on the Get Addons page with no URL pasting.
   public async getFeaturedAddons(installation: WowInstallation): Promise<AddonSearchResult[]> {
     try {
       const cat = await this.getCatalogue();
-      return await this.catalogueToResults(cat.addons, installation);
+      const { results, limited } = await this.catalogueResults(cat.addons, installation);
+      const last = this._lastFeatured.get(installation.id);
+      // GitHub's hourly limit refused part of this refresh: keep showing the last full list instead of blanking it
+      if (limited && last && last.length > results.length) {
+        console.warn("emporium: GitHub limit reached, showing the last catalogue list");
+        return last;
+      }
+      if (!limited) {
+        this._lastFeatured.set(installation.id, results);
+      }
+      return results;
     } catch (e) {
       console.error("emporium catalogue failed", e);
-      return [];
+      return this._lastFeatured.get(installation.id) ?? [];
     }
   }
 
@@ -295,7 +319,7 @@ export class GitHubAddonProvider extends AddonProvider {
         throw new AssetMissingError(addonUri.toString(), clientGroup);
       }
 
-      const repository = await this.getRepository(repoPath);
+      const repository = await this.getRepositoryInfo(repoPath);
       const author = repository.owner.login;
       const authorImageUrl = repository.owner.avatar_url;
 
@@ -347,7 +371,6 @@ export class GitHubAddonProvider extends AddonProvider {
   }
 
   private async getByIdAsync(addonId: string, installation: WowInstallation) {
-    const repository = await this.getRepository(addonId);
     const releases = await this.getReleases(addonId);
     if (!releases?.length) {
       return undefined;
@@ -366,6 +389,7 @@ export class GitHubAddonProvider extends AddonProvider {
     }
     console.debug("assetResult", assetResult);
 
+    const repository = await this.getRepositoryInfo(addonId);
     const author = repository.owner.login;
     const authorImageUrl = repository.owner.avatar_url;
     const addonName = this.getAddonName(addonId);
@@ -639,6 +663,23 @@ export class GitHubAddonProvider extends AddonProvider {
     return this.getWithRateLimit<GitHubRelease[]>(url);
   }
 
+  // With a token, the repository record says whether downloads must go through the API (private repos). Without one
+  // only public repos are visible, so the fields are built from the path and GitHub's hourly allowance is spared.
+  private async getRepositoryInfo(repositoryPath: string): Promise<GitHubRepository> {
+    if (await this.hasPersonalAccessKey()) {
+      return await this.getRepository(repositoryPath);
+    }
+    const parts = this.parseRepoPath(repositoryPath);
+    return {
+      name: parts.repository,
+      full_name: `${parts.owner}/${parts.repository}`,
+      private: false,
+      owner: { login: parts.owner, avatar_url: `https://github.com/${parts.owner}.png` },
+      html_url: `https://github.com/${parts.owner}/${parts.repository}`,
+      description: "",
+    } as GitHubRepository;
+  }
+
   private async getRepository(repositoryPath: string): Promise<GitHubRepository> {
     const parsed = this.parseRepoPath(repositoryPath);
     try {
@@ -692,6 +733,9 @@ export class GitHubAddonProvider extends AddonProvider {
   }
 
   private async hasPersonalAccessKey(): Promise<boolean> {
+    if (this._tokenRefused) {
+      return false;
+    }
     const pat = await this._sensitiveStorageService.getAsync(PREF_GITHUB_PERSONAL_ACCESS_TOKEN);
     return typeof pat === "string" && pat.length > 0;
   }
@@ -699,7 +743,7 @@ export class GitHubAddonProvider extends AddonProvider {
   private async getAuthorizationHeader(): Promise<{ [param: string]: string }> {
     const personalAccessToken = await this._sensitiveStorageService.getAsync(PREF_GITHUB_PERSONAL_ACCESS_TOKEN);
     const headers: { [param: string]: string } = {};
-    if (typeof personalAccessToken === "string" && personalAccessToken.length > 0) {
+    if (!this._tokenRefused && typeof personalAccessToken === "string" && personalAccessToken.length > 0) {
       headers.Authorization = `Bearer ${personalAccessToken}`;
     }
 
@@ -717,6 +761,12 @@ export class GitHubAddonProvider extends AddonProvider {
       return await firstValueFrom(this._httpClient.get<T>(url.toString(), { headers }));
     } catch (e) {
       if (e instanceof HttpErrorResponse) {
+        // An expired or revoked token answers 401 even for public repos: drop it for the session and carry on
+        if (e.status === 401 && (await this.hasPersonalAccessKey())) {
+          console.warn("emporium: GitHub refused the token (expired or revoked?), continuing without it");
+          this._tokenRefused = true;
+          return await this.getWithRateLimit<T>(url, expectBinary);
+        }
         this.handleRateLimitError(e);
         this.handleNotFoundError(e);
       }
