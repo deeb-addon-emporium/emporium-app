@@ -80,7 +80,7 @@ export class WarcraftService {
     return clientLocation?.location ?? "";
   }
 
-  public getInstalledProducts(blizzardAgentPath: string): Promise<Map<WowClientType, InstalledProduct>> {
+  public getInstalledProducts(blizzardAgentPath: string): Promise<Map<string, InstalledProduct>> {
     return this._warcraftApiService.getInstalledProducts(blizzardAgentPath);
   }
 

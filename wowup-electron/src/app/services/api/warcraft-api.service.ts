@@ -22,7 +22,7 @@ export class WarcraftApiService {
     return this._electronService.invoke(IPC_WARCRAFT_GET_BLIZZARD_AGENT_PATH);
   }
 
-  public getInstalledProducts(agentPath: string): Promise<Map<WowClientType, InstalledProduct>> {
+  public getInstalledProducts(agentPath: string): Promise<Map<string, InstalledProduct>> {
     return this._electronService.invoke(IPC_WARCRAFT_GET_INSTALLED_PRODUCTS, agentPath);
   }
 

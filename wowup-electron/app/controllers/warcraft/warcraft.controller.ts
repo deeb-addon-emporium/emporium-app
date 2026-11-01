@@ -44,13 +44,14 @@ export class WarcraftController implements IpcController {
     return agentPath;
   }
 
-  public async getInstalledProducts(agentPath: string): Promise<Map<WowClientType, InstalledProduct>> {
+  public async getInstalledProducts(agentPath: string): Promise<Map<string, InstalledProduct>> {
     const decoded = await decodeProducts(agentPath);
     const resolved = this.platform.resolveProducts(decoded, agentPath);
 
-    const result = new Map<WowClientType, InstalledProduct>();
+    // keyed by folder: _forever_ and _retail_ are both Retail-type clients
+    const result = new Map<string, InstalledProduct>();
     for (const product of resolved) {
-      result.set(product.clientType, product);
+      result.set(product.name, product);
     }
     return result;
   }

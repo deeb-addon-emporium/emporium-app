@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Injectable } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
 
-import { WOW_INSTALLATIONS_KEY } from "../../../common/constants";
+import { WOW_FOREVER_FOLDER, WOW_FOREVER_LABEL, WOW_INSTALLATIONS_KEY } from "../../../common/constants";
 import { getWowClientFolderName } from "../../../common/warcraft";
 import { getEnumName, getWowClientGroupForType } from "wowup-lib-core";
 import { ElectronService } from "../electron/electron.service";
@@ -18,6 +18,17 @@ import { AddonChannelType, WowClientGroup, WowClientType } from "wowup-lib-core"
 import { WowInstallation } from "wowup-lib-core";
 
 const DEFAULT_NAME_TOKEN = "{defaultName}";
+
+// WoW Forever is a Wow.exe (Retail-type) client in its own _forever_ folder: name it for what it is
+function isForeverLocation(location: string): boolean {
+  return path.basename(path.dirname(location ?? "")).toLowerCase() === WOW_FOREVER_FOLDER;
+}
+
+function installationLabel(installation: WowInstallation): string {
+  return installation.label === DEFAULT_NAME_TOKEN && isForeverLocation(installation.location)
+    ? WOW_FOREVER_LABEL
+    : installation.label;
+}
 
 @Injectable({
   providedIn: "root",
@@ -48,7 +59,7 @@ export class WarcraftInstallationService {
         // Saved display names can be unreliable (e.g. language change,
         // expansion release). Always regenerate them.
         const typeName = getEnumName(WowClientType, installation.clientType);
-        this.getDisplayName(installation.label, typeName)
+        this.getDisplayName(installationLabel(installation), typeName)
           .then((displayName) => (installation.displayName = displayName))
           .catch(() => {});
       }
@@ -138,12 +149,12 @@ export class WarcraftInstallationService {
 
   public async getInstallationDisplayName(wowInstallation: WowInstallation): Promise<string> {
     const typeName = getEnumName(WowClientType, wowInstallation.clientType);
-    return await this.getDisplayName(wowInstallation.label, typeName);
+    return await this.getDisplayName(installationLabel(wowInstallation), typeName);
   }
 
   public async updateWowInstallation(wowInstallation: WowInstallation): Promise<void> {
     const typeName = getEnumName(WowClientType, wowInstallation.clientType);
-    wowInstallation.displayName = await this.getDisplayName(wowInstallation.label, typeName);
+    wowInstallation.displayName = await this.getDisplayName(installationLabel(wowInstallation), typeName);
 
     const storedInstallations = await this.getWowInstallationsAsync();
     const matchIndex = _.findIndex(storedInstallations, (installation) => installation.id === wowInstallation.id);
@@ -221,9 +232,11 @@ export class WarcraftInstallationService {
     const typeName = getEnumName(WowClientType, clientType);
     const currentInstallations = await this.getWowInstallationsByClientType(clientType);
 
-    const label = currentInstallations.length
-      ? `${DEFAULT_NAME_TOKEN} ${currentInstallations.length + 1}`
-      : DEFAULT_NAME_TOKEN;
+    const label = isForeverLocation(applicationPath)
+      ? WOW_FOREVER_LABEL
+      : currentInstallations.length
+        ? `${DEFAULT_NAME_TOKEN} ${currentInstallations.length + 1}`
+        : DEFAULT_NAME_TOKEN;
 
     const displayName = await this.getDisplayName(label, typeName);
 
@@ -255,12 +268,19 @@ export class WarcraftInstallationService {
       const typeName = getEnumName(WowClientType, product.clientType);
       const currentInstallations = await this.getWowInstallationsByClientType(product.clientType);
 
-      const label = currentInstallations.length
-        ? `${DEFAULT_NAME_TOKEN} ${currentInstallations.length + 1}`
-        : DEFAULT_NAME_TOKEN;
+      const forever = product.name === WOW_FOREVER_FOLDER;
+      const label = forever
+        ? WOW_FOREVER_LABEL
+        : currentInstallations.length
+          ? `${DEFAULT_NAME_TOKEN} ${currentInstallations.length + 1}`
+          : DEFAULT_NAME_TOKEN;
       const displayName = await this.getDisplayName(label, typeName);
 
-      const fullProductPath = await this.getFullProductPath(product.location, product.clientType);
+      const fullProductPath = await this.getFullProductPath(
+        product.location,
+        product.clientType,
+        forever ? WOW_FOREVER_FOLDER : undefined,
+      );
 
       if (currentInstallations.some((inst) => inst.location === fullProductPath)) {
         continue;
@@ -301,8 +321,8 @@ export class WarcraftInstallationService {
     return finalLabel;
   }
 
-  private async getFullProductPath(location: string, clientType: WowClientType): Promise<string> {
-    const clientFolderName = getWowClientFolderName(clientType);
+  private async getFullProductPath(location: string, clientType: WowClientType, folderName?: string): Promise<string> {
+    const clientFolderName = folderName ?? getWowClientFolderName(clientType);
     const executableName = await this._warcraftService.getExecutableName(clientType);
     return path.join(location, clientFolderName, executableName);
   }

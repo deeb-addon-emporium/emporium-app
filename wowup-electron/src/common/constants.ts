@@ -217,6 +217,9 @@ export const WOW_RETAIL_PTR_FOLDER = "_ptr_";
 export const WOW_RETAIL_XPTR_FOLDER = "_xptr_";
 export const WOW_RETAIL_FOLDER = "_retail_";
 export const WOW_ANNIVERSARY_FOLDER = "_anniversary_";
+// WoW Forever (product wowf): runs Wow.exe from its own folder, so it is a Retail-type install
+export const WOW_FOREVER_FOLDER = "_forever_";
+export const WOW_FOREVER_LABEL = "WoW Forever";
 export const WOW_ADDON_FOLDER_NAME = "AddOns";
 export const WOW_INTERFACE_FOLDER_NAME = "Interface";
 
