@@ -311,7 +311,7 @@ export class GitHubAddonProvider extends AddonProvider {
         files: [
           {
             channelType: result.release?.prerelease ? AddonChannelType.Beta : AddonChannelType.Stable,
-            downloadUrl: asset?.browser_download_url || asset?.url || "",
+            downloadUrl: this.assetDownloadUrl(repository, asset),
             folders: [],
             gameVersion: "",
             releaseDate: new Date(result.release?.published_at ?? ""),
@@ -374,7 +374,7 @@ export class GitHubAddonProvider extends AddonProvider {
 
     const searchResultFile: AddonSearchResultFile = {
       channelType: AddonChannelType.Stable,
-      downloadUrl: asset?.browser_download_url || asset?.url || "",
+      downloadUrl: this.assetDownloadUrl(repository, asset),
       folders: [addonName],
       gameVersion: "",
       version: (assetResult.release?.tag_name ?? asset?.name ?? "").replace(/^v/, ""),
@@ -680,6 +680,15 @@ export class GitHubAddonProvider extends AddonProvider {
 
   private getIntHeader(headers: HttpHeaders, key: string) {
     return parseInt(headers.get(key) ?? "", 10);
+  }
+
+  // A private repo's browser_download_url answers 404 even with a token; its API address (with the
+  // Accept: application/octet-stream header getDownloadAuth adds) redirects to the file.
+  private assetDownloadUrl(repository: GitHubRepository, asset: GitHubAsset | undefined): string {
+    if (repository.private) {
+      return asset?.url || "";
+    }
+    return asset?.browser_download_url || asset?.url || "";
   }
 
   private async hasPersonalAccessKey(): Promise<boolean> {
